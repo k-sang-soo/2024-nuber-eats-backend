@@ -10,8 +10,7 @@ exports.AppModule = void 0;
 const apollo_1 = require("@nestjs/apollo");
 const common_1 = require("@nestjs/common");
 const graphql_1 = require("@nestjs/graphql");
-const path_1 = require("path");
-const restaurnats_module_1 = require("./restaurnats/restaurnats.module");
+const restaurants_module_1 = require("./restaurants/restaurants.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -20,9 +19,9 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             graphql_1.GraphQLModule.forRoot({
                 driver: apollo_1.ApolloDriver,
-                autoSchemaFile: (0, path_1.join)(process.cwd(), 'scr/schema.gql'),
+                autoSchemaFile: true,
             }),
-            restaurnats_module_1.RestaurnatsModule,
+            restaurants_module_1.RestaurantsModule,
         ],
         controllers: [],
         providers: [],
