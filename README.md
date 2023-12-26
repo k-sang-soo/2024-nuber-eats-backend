@@ -29,6 +29,8 @@
 ## setting
 
 node/npm: 18.16.0/9.5.1
+DB: postgresql
+ORM 라이브러리: TypeORM
 
 ## Installation
 
