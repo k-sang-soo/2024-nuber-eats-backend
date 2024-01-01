@@ -4,12 +4,23 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import * as Joi from 'joi';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // 어디서나 config 모듈에 접근할 수 있게하는 지
-      envFilePath: process.env.NODE_ENV === 'dev' ? '.dev.env' : '.test.env',
+      isGlobal: true, // 어디서나 config 모듈에 접근할 수 있게하는지
+      envFilePath: process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.test',
+      ignoreEnvFile: process.env.NODE_ENV === 'prod', //서버에 deploy 할 때 환경변수 파일을 사용할껀지
+      validationSchema: Joi.object({
+        // 환경변수 유효성 검사
+        NODE_ENV: Joi.string().valid('dev', 'prod').required(),
+        DB_HOST: Joi.string().required(),
+        DB_PORT: Joi.string().required(),
+        DB_USERNAME: Joi.string().required(),
+        DB_PASSWORD: Joi.string().required(),
+        DB_NAME: Joi.string().required(),
+      }),
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -18,11 +29,11 @@ import { ConfigModule } from '@nestjs/config';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'jeonmin-a',
-      password: '1111',
-      database: 'nuber-eats',
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
       synchronize: true, //TypeORM이 데이터베이스에 연결할 때 데이터베이스를 너의 모듈의 현재 상태로 마이그레이션 한다는 뜻
       logging: true, //데이터베이스에 무슨 일이 일어나는지 표시
     }),
