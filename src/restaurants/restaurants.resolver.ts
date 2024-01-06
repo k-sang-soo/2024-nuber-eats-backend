@@ -2,6 +2,7 @@ import { RestaurantService } from './restaurants.service';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Restaurant } from './entities/restaurant.entity';
 import { CreateRestaurantDto } from './dtos/create-restaurant.dto';
+import { UpdateRestaurantDto } from './dtos/update-restaurant';
 
 @Resolver((of) => Restaurant)
 export class RestaurantsResolver {
@@ -19,7 +20,22 @@ export class RestaurantsResolver {
     @Args('input') createRestaurantDto: CreateRestaurantDto,
   ): Promise<boolean> {
     try {
+      // resolver에서 service의 메서드를 호출하여 서비스에 정의된 비즈니스 로직을 실행하는 역할.
+      // 이 과정에서 resolver은 클라이언트로부터 받은 데이터를 서비스에 전달함
       await this.restaurantService.createRestaurant(createRestaurantDto);
+      return true;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  }
+
+  @Mutation((returns) => Boolean)
+  async updateRestaurant(
+    @Args('input') updateRestaurantDto: UpdateRestaurantDto,
+  ): Promise<boolean> {
+    try {
+      await this.restaurantService.updateRestaurant(updateRestaurantDto);
       return true;
     } catch (e) {
       console.log(e);

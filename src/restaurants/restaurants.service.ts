@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Restaurant } from './entities/restaurant.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UpdateRestaurantDto } from './dtos/update-restaurant';
 
 @Injectable()
 export class RestaurantService {
@@ -23,5 +24,10 @@ export class RestaurantService {
     // save는 엔티티를 데이터베이스에 저장 또는 업데이트, 데이터베이스에 지정된 모든 엔터티를 저장. 엔티티가 데이터베이스에 없으면 삽입하고, 그렇지 않으면 업데이트.
     const newRestaurant = this.restaurants.create(createRestaurantDto);
     return this.restaurants.save(newRestaurant);
+  }
+  updateRestaurant({ id, data }: UpdateRestaurantDto) {
+    // update() 의 첫번째 arg는 search 의 criteria(기준), 쉽게 말해 첫번째 arg에 해당하는 db를 찾아서 데이터를 변경.
+    // update() 는 db에 해당 entity가 있는 지 확인하지 않음
+    this.restaurants.update(id, { ...data });
   }
 }
