@@ -15,7 +15,7 @@ const config_1 = require("@nestjs/config");
 const Joi = require("joi");
 const users_module_1 = require("./users/users.module");
 const common_module_1 = require("./common/common.module");
-const user_entity_1 = require("./users/entities/user.entity");
+const users_entity_1 = require("./users/entities/users.entity");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -48,7 +48,7 @@ exports.AppModule = AppModule = __decorate([
                 database: process.env.DB_NAME,
                 synchronize: process.env.NODE_ENV !== 'prod',
                 logging: process.env.NODE_ENV !== 'prod',
-                entities: [user_entity_1.User],
+                entities: [users_entity_1.User],
             }),
             users_module_1.UsersModule,
             common_module_1.CommonModule,
