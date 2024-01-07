@@ -9,7 +9,7 @@ export class CreateAccountInput extends PickType(User, [
 ]) {}
 
 @ObjectType()
-export class CreateAccountOut {
+export class CreateAccountOutput {
   @Field((type) => String, { nullable: true })
   error?: string;
 
