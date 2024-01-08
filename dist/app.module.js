@@ -16,6 +16,7 @@ const Joi = require("joi");
 const users_module_1 = require("./users/users.module");
 const common_module_1 = require("./common/common.module");
 const users_entity_1 = require("./users/entities/users.entity");
+const jwt_module_1 = require("./jwt/jwt.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -51,8 +52,10 @@ exports.AppModule = AppModule = __decorate([
                 logging: process.env.NODE_ENV !== 'prod',
                 entities: [users_entity_1.User],
             }),
+            jwt_module_1.JwtModule.forRoot(),
             users_module_1.UsersModule,
             common_module_1.CommonModule,
+            jwt_module_1.JwtModule,
         ],
         controllers: [],
         providers: [],

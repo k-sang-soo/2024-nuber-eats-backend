@@ -7,6 +7,7 @@ import * as Joi from 'joi';
 import { UsersModule } from './users/users.module';
 import { CommonModule } from './common/common.module';
 import { User } from './users/entities/users.entity';
+import { JwtModule } from './jwt/jwt.module';
 
 @Module({
   imports: [
@@ -41,8 +42,10 @@ import { User } from './users/entities/users.entity';
       logging: process.env.NODE_ENV !== 'prod', //데이터베이스에 무슨 일이 일어나는지 표시
       entities: [User],
     }),
+    JwtModule.forRoot(),
     UsersModule,
     CommonModule,
+    JwtModule,
   ],
   controllers: [],
   providers: [],
