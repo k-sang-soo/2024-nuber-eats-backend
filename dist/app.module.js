@@ -34,7 +34,7 @@ exports.AppModule = AppModule = __decorate([
                     DB_USERNAME: Joi.string().required(),
                     DB_PASSWORD: Joi.string().required(),
                     DB_NAME: Joi.string().required(),
-                    SECRET_KEY: Joi.string().required(),
+                    PRIVATE_KEY: Joi.string().required(),
                 }),
             }),
             graphql_1.GraphQLModule.forRoot({
@@ -52,7 +52,9 @@ exports.AppModule = AppModule = __decorate([
                 logging: process.env.NODE_ENV !== 'prod',
                 entities: [users_entity_1.User],
             }),
-            jwt_module_1.JwtModule.forRoot(),
+            jwt_module_1.JwtModule.forRoot({
+                privateKey: process.env.PRIVATE_KEY,
+            }),
             users_module_1.UsersModule,
             common_module_1.CommonModule,
             jwt_module_1.JwtModule,
