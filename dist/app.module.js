@@ -17,7 +17,14 @@ const users_module_1 = require("./users/users.module");
 const common_module_1 = require("./common/common.module");
 const users_entity_1 = require("./users/entities/users.entity");
 const jwt_module_1 = require("./jwt/jwt.module");
+const jwt_middleware_1 = require("./jwt/jwt.middleware");
 let AppModule = class AppModule {
+    configure(consumer) {
+        consumer.apply(jwt_middleware_1.jwtMiddleware).forRoutes({
+            path: '/graphql',
+            method: common_1.RequestMethod.ALL,
+        });
+    }
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
