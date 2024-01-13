@@ -20,7 +20,7 @@ const jwt_module_1 = require("./jwt/jwt.module");
 const jwt_middleware_1 = require("./jwt/jwt.middleware");
 let AppModule = class AppModule {
     configure(consumer) {
-        consumer.apply(jwt_middleware_1.jwtMiddleware).forRoutes({
+        consumer.apply(jwt_middleware_1.JwtMiddleWare).forRoutes({
             path: '/graphql',
             method: common_1.RequestMethod.ALL,
         });
