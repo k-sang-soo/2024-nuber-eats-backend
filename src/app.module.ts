@@ -14,6 +14,7 @@ import { CommonModule } from './common/common.module';
 import { User } from './users/entities/users.entity';
 import { JwtModule } from './jwt/jwt.module';
 import { JwtMiddleWare } from './jwt/jwt.middleware';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -55,14 +56,15 @@ import { JwtMiddleWare } from './jwt/jwt.middleware';
       privateKey: process.env.PRIVATE_KEY,
     }),
     UsersModule,
-    CommonModule,
     JwtModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
 })
 
-//미들웨어 설정
+// 미들웨어 설정
+// AppModule 클래스에서 NestModule 인터페이스를 사용함으로써, 미들웨어를 설정
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(JwtMiddleWare).forRoutes({

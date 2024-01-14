@@ -8,9 +8,7 @@ export class JwtService {
   constructor(
     @Inject(CONFIG_OPTIONS)
     private readonly options: JwtModuleOptions, // configService로 해결할 수 있지만 연습을 위해서 JwtModuleOptions 사용 // private readonly configService: ConfigService
-  ) {
-    console.log(options);
-  }
+  ) {}
   sign(userID: number): string {
     // configService로 해결할 수 있지만 연습을 위해서 JwtModuleOptions 사용 // private readonly configService: ConfigService
     // return jwt.sign(payload, this.configService.get('PRIVATE_KEY'));
