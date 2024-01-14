@@ -36,6 +36,9 @@ import { JwtMiddleWare } from './jwt/jwt.middleware';
       driver: ApolloDriver,
       // code first 방법: 코드를 기반으로 자동으로 스키마가 생성
       autoSchemaFile: true,
+      // context: 각 GraphQL 요청에 대한 컨텍스트 정보를 설정
+      // 이를 통해 리졸버 내에서 컨테스트 정보에 접근할 수 있음
+      context: ({ req }) => ({ user: req['user'] }),
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -64,7 +67,7 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(JwtMiddleWare).forRoutes({
       path: '/graphql', // * 를 입력하면 모든 경로에 적용
-      method: RequestMethod.ALL, // RequestMethod.ALL 을 하면 모든 HTTP 요청에 적용
+      method: RequestMethod.POST, // RequestMethod.ALL 을 하면 모든 HTTP 요청에 적용
     });
   }
 }

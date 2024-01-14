@@ -22,7 +22,7 @@ let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(jwt_middleware_1.JwtMiddleWare).forRoutes({
             path: '/graphql',
-            method: common_1.RequestMethod.ALL,
+            method: common_1.RequestMethod.POST,
         });
     }
 };
@@ -47,6 +47,7 @@ exports.AppModule = AppModule = __decorate([
             graphql_1.GraphQLModule.forRoot({
                 driver: apollo_1.ApolloDriver,
                 autoSchemaFile: true,
+                context: ({ req }) => ({ user: req['user'] }),
             }),
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'postgres',
