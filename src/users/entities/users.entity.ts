@@ -37,6 +37,7 @@ export class User extends CoreEntity {
   @IsEnum(UserRole)
   role: UserRole;
 
+  // BeforeInsert는 entity가 데이터베이스에 저장되기 전에 자동으로 실행되는 함수
   @BeforeInsert()
   async hashPassword(): Promise<void> {
     try {

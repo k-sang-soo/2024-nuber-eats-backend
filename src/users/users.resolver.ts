@@ -8,6 +8,7 @@ import {
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthUser } from 'src/auth/auth-user.decorator';
 
 @Resolver((of) => User)
 export class UsersResolver {
@@ -45,6 +46,10 @@ export class UsersResolver {
   }
 
   @Query((returns) => User)
+  // AuthGuard는 reuqest를 처리하리 전에 실행되고 reuqest 요청을 넘겨줄지만 판단
+  // AuthGuard를 통과하고 AuthUser를 통해서 매개변수로 context의 값을 받아옴
   @UseGuards(AuthGuard)
-  me() {}
+  me(@AuthUser() authUser: User) {
+    return authUser;
+  }
 }
