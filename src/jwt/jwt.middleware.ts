@@ -13,16 +13,15 @@ export class JwtMiddleWare implements NestMiddleware {
     if ('x-jwt' in req.headers) {
       console.log(req.headers);
       const token = req.headers['x-jwt'];
-      const decoded = this.jwtService.verit(token.toString());
-      console.log('token', token);
-      // decoded 타입이 object 이고 decoded의 프로퍼티 중에 id가 있으면
-      if (typeof decoded === 'object' && decoded.hasOwnProperty('id')) {
-        try {
+      try {
+        const decoded = this.jwtService.verit(token.toString());
+        // decoded 타입이 object 이고 decoded의 프로퍼티 중에 id가 있으면
+        if (typeof decoded === 'object' && decoded.hasOwnProperty('id')) {
           const user = await this.userService.findById(decoded['id']);
-          console.log('user', user);
+          // request 객체에 user 프로퍼티와 값을 추가한다.
           req['user'] = user;
-        } catch (e) {}
-      }
+        }
+      } catch (e) {}
     }
     next();
   }

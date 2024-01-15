@@ -7,11 +7,11 @@ export class AuthGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
+    console.log('context', context);
     // context를 받으면 http로 되어있음
     // 이걸 GraphQl의 context로 변경하는 작업
     const gqlContext = GqlExecutionContext.create(context).getContext();
     const user = gqlContext['user'];
-    console.log('user', user);
     if (!user) {
       return false;
     }
