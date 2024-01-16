@@ -10,7 +10,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { UsersModule } from './users/users.module';
-import { CommonModule } from './common/common.module';
 import { User } from './users/entities/users.entity';
 import { JwtModule } from './jwt/jwt.module';
 import { JwtMiddleWare } from './jwt/jwt.middleware';
@@ -39,6 +38,7 @@ import { AuthModule } from './auth/auth.module';
       autoSchemaFile: true,
       // context: 각 GraphQL 요청에 대한 컨텍스트 정보를 설정
       // 이를 통해 리졸버 내에서 컨테스트 정보에 접근할 수 있음
+      // 여기서는 jwtMiddleware에서 reuqest에 설정한 user의 값을 가지고 와서 설정
       context: ({ req }) => ({ user: req['user'] }),
     }),
     TypeOrmModule.forRoot({
