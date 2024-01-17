@@ -6,6 +6,7 @@ import { CreateAccountInput } from './dtos/create-account.dto';
 import { LoginInput } from './dtos/login.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from 'src/jwt/jwt.service';
+import { EditProfileInput } from './dtos/edit-profile';
 
 @Injectable()
 export class UsersService {
@@ -81,5 +82,12 @@ export class UsersService {
 
   async findById(id: number): Promise<User> {
     return this.users.findOne({ where: { id } });
+  }
+
+  async editProfile(userId: number, { email, password }: EditProfileInput) {
+    // update 는 빠르고 효율적인 동작을 위해 data가 존재 유/무를 따지지 않고 무조건 업데이트 시켜줌
+    // 원래라면 유효성 검사를 해야겠지만 userId가 없으면 login을 할 수 없기 때문에 검증 없이 사용
+    // userId는 graphQL이 아니고 token 의 데이터이기 때문에 검증 됐다고 판단
+    return this.users.update(userId, { email, password });
   }
 }
