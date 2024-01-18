@@ -42,8 +42,13 @@ export class User extends CoreEntity {
   @IsEnum(UserRole)
   role: UserRole;
 
+  @Column({ default: false })
+  @Field((type) => Boolean)
+  verified: boolean;
+
   // BeforeInsert는 entity가 데이터베이스에 저장되기 전에 자동으로 실행되는 함수
   @BeforeInsert()
+  // BeforeUpdate는 editPorfile 에서 User 데이터를 수정하기전에 실행 되는 함수
   @BeforeUpdate()
   async hashPassword(): Promise<void> {
     try {
