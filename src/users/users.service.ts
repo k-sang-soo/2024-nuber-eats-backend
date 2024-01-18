@@ -84,10 +84,37 @@ export class UsersService {
     return this.users.findOne({ where: { id } });
   }
 
-  async editProfile(userId: number, { email, password }: EditProfileInput) {
+  async editProfile(
+    userId: number,
+    { email, password }: EditProfileInput,
+  ): Promise<User> {
     // update 는 빠르고 효율적인 동작을 위해 data가 존재 유/무를 따지지 않고 무조건 업데이트 시켜줌
     // 원래라면 유효성 검사를 해야겠지만 userId가 없으면 login을 할 수 없기 때문에 검증 없이 사용
     // userId는 graphQL이 아니고 token 의 데이터이기 때문에 검증 됐다고 판단
-    return this.users.update(userId, { email, password });
+
+    // args 를 받을 떄 { email, password } 이런식으로 사용하게 된다면
+    // password를 보내지 않았을 때 undefined 값을 받게 된다.
+    // return this.users.update(userId, { email, password });
+
+    // updeate에서 save로 변경한 이유는 password를 hash화 시커야되는데
+    // update는 entity가 있는 지 확인하지 않고 바로 db에서 데이터를 변경하기 때문에
+    // entity에서 BeforeUpdate 가 작동되지 않는다.
+    // save를 사용하면 기존에 없는 건 생성하고 기존에 존재하는 경우에는 update를 한다.
+
+    const user = await this.users.findOne({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (email) {
+      (await user).email = email;
+    }
+
+    if (password) {
+      (await user).password = password;
+    }
+
+    return this.users.save(user);
   }
 }
