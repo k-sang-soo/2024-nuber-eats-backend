@@ -7,11 +7,14 @@ import { LoginInput } from './dtos/login.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from 'src/jwt/jwt.service';
 import { EditProfileInput } from './dtos/edit-profile';
+import { Verification } from './entities/verification.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly users: Repository<User>,
+    @InjectRepository(Verification)
+    private readonly verification: Repository<Verification>,
     private readonly config: ConfigService,
     private readonly jwtService: JwtService,
   ) {}
@@ -33,7 +36,14 @@ export class UsersService {
         };
       }
       // 오류가 없다면 아무것도 return 하지 않음
-      await this.users.save(this.users.create({ email, password, role }));
+      const user = await this.users.save(
+        this.users.create({ email, password, role }),
+      );
+      await this.verification.save(
+        this.verification.create({
+          user,
+        }),
+      );
       return {
         ok: true,
       };
@@ -108,11 +118,13 @@ export class UsersService {
     });
 
     if (email) {
-      (await user).email = email;
+      user.email = email;
+      user.verified = false;
+      await this.verification.save(this.verification.create({ user }));
     }
 
     if (password) {
-      (await user).password = password;
+      user.password = password;
     }
 
     return this.users.save(user);
