@@ -7,6 +7,8 @@ import { v4 as uuidv4 } from 'uuid';
 @InputType({ isAbstract: true })
 @ObjectType()
 @Entity()
+// verification 을 만들어서 사용하는 이유는 보안상의 이유로
+// 사용자의 개인 정보를 직접 노출시키지 않고 인증 코드를 사용하는 방식
 export class Verification extends CoreEntity {
   @Column()
   @Field((types) => String)

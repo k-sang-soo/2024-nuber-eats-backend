@@ -133,6 +133,8 @@ export class UsersService {
   async verifyEmail(code: string): Promise<boolean> {
     const verification = await this.verification.findOne({
       where: { code },
+      // relations 설정이 되어있어야 entity의 관계 ID를 로드하고
+      // 해당 필드의 전체 데이터를 가져올 수 있다.
       relations: ['user'],
     });
     if (verification) {
