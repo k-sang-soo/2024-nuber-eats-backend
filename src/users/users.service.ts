@@ -2,12 +2,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/users.entity';
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { CreateAccountInput } from './dtos/create-account.dto';
-import { LoginInput } from './dtos/login.dto';
+import {
+  CreateAccountInput,
+  CreateAccountOutput,
+} from './dtos/create-account.dto';
+import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from 'src/jwt/jwt.service';
-import { EditProfileInput } from './dtos/edit-profile';
+import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile';
 import { Verification } from './entities/verification.entity';
+import { UserProfileOutPut } from './dtos/user-profile.dto';
+import { VerifyEmailOutput } from './dtos/verify-email.dto';
 
 @Injectable()
 export class UsersService {
@@ -23,7 +28,7 @@ export class UsersService {
     email,
     password,
     role,
-  }: CreateAccountInput): Promise<{ ok: boolean; error?: string }> {
+  }: CreateAccountInput): Promise<CreateAccountOutput> {
     // check new user
     try {
       // findOne 주어진 condition(환경)과 일치하는 첫 번째 entity를 찾는다.
@@ -55,10 +60,7 @@ export class UsersService {
     }
   }
 
-  async login({
-    email,
-    password,
-  }: LoginInput): Promise<{ ok: boolean; error?: string; token?: string }> {
+  async login({ email, password }: LoginInput): Promise<LoginOutput> {
     try {
       // find the user with the email
       // check if the apssword is correct
@@ -93,14 +95,27 @@ export class UsersService {
     }
   }
 
-  async findById(id: number): Promise<User> {
-    return this.users.findOne({ where: { id } });
+  async findById(id: number): Promise<UserProfileOutPut> {
+    try {
+      const user = await this.users.findOne({ where: { id } });
+      if (user) {
+        return {
+          ok: true,
+          user,
+        };
+      }
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'User Not Found',
+      };
+    }
   }
 
   async editProfile(
     userId: number,
     { email, password }: EditProfileInput,
-  ): Promise<User> {
+  ): Promise<EditProfileOutput> {
     // update 는 빠르고 효율적인 동작을 위해 data가 존재 유/무를 따지지 않고 무조건 업데이트 시켜줌
     // 원래라면 유효성 검사를 해야겠지만 userId가 없으면 login을 할 수 없기 때문에 검증 없이 사용
     // userId는 graphQL이 아니고 token 의 데이터이기 때문에 검증 됐다고 판단
@@ -113,27 +128,36 @@ export class UsersService {
     // update는 entity가 있는 지 확인하지 않고 바로 db에서 데이터를 변경하기 때문에
     // entity에서 BeforeUpdate 가 작동되지 않는다.
     // save를 사용하면 기존에 없는 건 생성하고 기존에 존재하는 경우에는 update를 한다.
+    try {
+      const user = await this.users.findOne({
+        where: {
+          id: userId,
+        },
+      });
 
-    const user = await this.users.findOne({
-      where: {
-        id: userId,
-      },
-    });
+      if (email) {
+        user.email = email;
+        user.verified = false;
+        await this.verification.save(this.verification.create({ user }));
+      }
 
-    if (email) {
-      user.email = email;
-      user.verified = false;
-      await this.verification.save(this.verification.create({ user }));
+      if (password) {
+        user.password = password;
+      }
+
+      await this.users.save(user);
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'Could not update profile.',
+      };
     }
-
-    if (password) {
-      user.password = password;
-    }
-
-    return this.users.save(user);
   }
 
-  async verifyEmail(code: string): Promise<boolean> {
+  async verifyEmail(code: string): Promise<VerifyEmailOutput> {
     try {
       const verification = await this.verification.findOne({
         where: { code },
@@ -144,11 +168,19 @@ export class UsersService {
       if (verification) {
         verification.user.verified = true;
         this.users.save(verification.user);
-        return true;
+        return {
+          ok: true,
+        };
       }
-      throw new Error();
-    } catch (e) {
-      return false;
+      return {
+        ok: false,
+        error: 'Verification not found.',
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
     }
   }
 }
