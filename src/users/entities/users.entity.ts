@@ -33,7 +33,9 @@ export class User extends CoreEntity {
   @IsEmail()
   email: string;
 
-  @Column()
+  // User entity를 가져올 때 해당 column을 항상 가져올지 선택. 기본 값은 "true"
+  // false로 지정하게 되면 해당 column을 DB로부터 찾아오지 않느다.
+  @Column({ select: false })
   @Field((type) => String)
   password: string;
 
@@ -51,10 +53,13 @@ export class User extends CoreEntity {
   // BeforeUpdate는 editPorfile 에서 User 데이터를 수정하기전에 실행 되는 함수
   @BeforeUpdate()
   async hashPassword(): Promise<void> {
-    try {
-      this.password = await bcrypt.hash(this.password, 10);
-    } catch (e) {
-      throw new InternalServerErrorException();
+    // password가 포함되어있지 않을 때도 hash 하게 된다면 비밀번호가 기존과 다르게 나옴
+    if (this.password) {
+      try {
+        this.password = await bcrypt.hash(this.password, 10);
+      } catch (e) {
+        throw new InternalServerErrorException();
+      }
     }
   }
 

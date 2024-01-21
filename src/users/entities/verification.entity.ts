@@ -19,7 +19,10 @@ export class Verification extends CoreEntity {
   // Verification 은 오로지 하나의 User만 가질 수 있고
   // User도 외직 하나의 Verification만 가질 수 있다
   //JoinColumn은 필수 값으로 기준이 되고 싶은 곳에 적으면 됨
-  @OneToOne((type) => User)
+
+  // onDelete 란 "user"가 삭제 되었을 때의 동작을 정의
+  // CASCADE는 user와 붙어있는 verification도 같이 삭제한다는 의미
+  @OneToOne((type) => User, { onDelete: 'CASCADE' })
   @JoinColumn()
   // Verification 테이블에 userId 라는 외래 키 컬럼이 추가 된 이유는
   // User 테이블의 기본 키('id')와 연결되어, Verification이 어떤 User와 연결되어있는지를 나타내줌
