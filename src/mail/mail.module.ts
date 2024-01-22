@@ -10,7 +10,7 @@ export class MailModule {
       module: MailModule,
       providers: [
         {
-          provide: CONFIG_OPTIONS,
+          provide: CONFIG_OPTIONS.mail,
           useValue: options,
         },
       ],
