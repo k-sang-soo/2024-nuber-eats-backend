@@ -11,7 +11,10 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { UserProfileInput, UserProfileOutPut } from './dtos/user-profile.dto';
 import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile';
-import { VerifyEmailInput, VerifyEmailOutput } from './dtos/verify-email.dto';
+import {
+  VerifyEmailInput,
+  VerifyEmailOutput,
+} from './entities/verify-email.dto';
 
 @Resolver((of) => User)
 export class UsersResolver {

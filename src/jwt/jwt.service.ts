@@ -6,7 +6,7 @@ import { CONFIG_OPTIONS } from 'src/common/common.constants';
 @Injectable()
 export class JwtService {
   constructor(
-    @Inject(CONFIG_OPTIONS)
+    @Inject(CONFIG_OPTIONS.jwt)
     private readonly options: JwtModuleOptions, // configService로 해결할 수 있지만 연습을 위해서 JwtModuleOptions 사용 // private readonly configService: ConfigService
   ) {}
   sign(userID: number): string {

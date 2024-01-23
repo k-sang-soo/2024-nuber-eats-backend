@@ -12,7 +12,7 @@ import { JwtService } from 'src/jwt/jwt.service';
 import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile';
 import { Verification } from './entities/verification.entity';
 import { UserProfileOutPut } from './dtos/user-profile.dto';
-import { VerifyEmailOutput } from './dtos/verify-email.dto';
+import { VerifyEmailOutput } from './entities/verify-email.dto';
 
 @Injectable()
 export class UsersService {
