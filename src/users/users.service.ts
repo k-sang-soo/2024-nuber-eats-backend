@@ -141,12 +141,15 @@ export class UsersService {
       if (email) {
         user.email = email;
         user.verified = false;
-        console.log('user', user);
+
+        //verification 테이블에서 userId가 고유해야하지만
+        // 그냥 생성히고 저장을 한다면 고유 제약 조건(unique constraint)이 위반 된다.
+        // 따라서, 우선적 기존 레코드를 삭제한다.
+        await this.verification.delete({ user: { id: user.id } });
         const verification = await this.verification.save(
           this.verification.create({ user }),
         );
 
-        console.log('verification', verification);
         this.mailService.sendVerificationEmail(user.email, verification.code);
       }
 
