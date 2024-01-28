@@ -6,6 +6,7 @@ import { Verification } from './entities/verification.entity';
 import { JwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
 import { ConfigService } from '@nestjs/config';
+import { Repository } from 'typeorm';
 
 const mockRespository = {
   findOne: jest.fn(),
@@ -24,9 +25,15 @@ const mockMailService = {
 
 const mockConfigService = {};
 
+// mockRespository 다른 점은 mockRespository은 UsersService 사용하는 함수
+// MockRepository 은 함수의 반환 값을 속이기 위함
+type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
+
 // user service 유닛 테스트
 describe('UserService', () => {
   let service: UsersService;
+  let usersRepository: MockRepository<User>;
+
   // beforeAll 모든 테스트가 실행되기 전에 딱 한 번 함수를 실행
   beforeAll(async () => {
     // 테스트만 할 수 있는 독립된 테스팅 모듈 생성
@@ -58,13 +65,31 @@ describe('UserService', () => {
       ],
     }).compile();
     service = module.get<UsersService>(UsersService);
+    usersRepository = module.get(getRepositoryToken(User));
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  it.todo('createAccount');
+  describe('createAccount', () => {
+    it('should fail if user exists', async () => {
+      usersRepository.findOne.mockResolvedValue({
+        id: 1,
+        email: 'allalalaa',
+      });
+      const result = await service.createAccount({
+        email: '',
+        password: '',
+        role: 0,
+      });
+      expect(result).toMatchObject({
+        ok: false,
+        error: 'There is a user with that email already',
+      });
+    });
+  });
+
   it.todo('login');
   it.todo('findById');
   it.todo('editProfile');
