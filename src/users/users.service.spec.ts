@@ -33,9 +33,15 @@ type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 describe('UserService', () => {
   let service: UsersService;
   let usersRepository: MockRepository<User>;
+  let verificationRepository: MockRepository<Verification>;
+  let mailService: MailService;
 
   // beforeAll 모든 테스트가 실행되기 전에 딱 한 번 함수를 실행
-  beforeAll(async () => {
+  // beforeAll 은 모든 테스트에 적용되는 전역적인 설정에 사용
+  // beforeEach 는 각 테스트 함수 마다 독립적인 설정 또는 상태를 설정할 때 사용
+  // beforeEach 는 테스트 함수마다 독립적인 초기화 작업에 사용
+
+  beforeEach(async () => {
     // 테스트만 할 수 있는 독립된 테스팅 모듈 생성
     const module = await Test.createTestingModule({
       providers: [
@@ -65,7 +71,9 @@ describe('UserService', () => {
       ],
     }).compile();
     service = module.get<UsersService>(UsersService);
+    mailService = module.get<MailService>(MailService);
     usersRepository = module.get(getRepositoryToken(User));
+    verificationRepository = module.get(getRepositoryToken(Verification));
   });
 
   it('should be defined', () => {
@@ -103,19 +111,66 @@ describe('UserService', () => {
 
       // TypeORM 레포지토리의 create 메소드를 mock
       usersRepository.create.mockReturnValue(createAccountArgs);
+      usersRepository.save.mockResolvedValue(createAccountArgs);
+      verificationRepository.create.mockReturnValue({
+        user: createAccountArgs,
+      });
+      // sendVerificationEmail 을 실행시켜주기 위해 save를 호출 할 때 code를 return 함
+      verificationRepository.save.mockReturnValue({
+        code: 'code',
+      });
 
       // UsersService 의 createAccount 를 호출
-      await service.createAccount(createAccountArgs);
+      const result = await service.createAccount(createAccountArgs);
       // 이 함수가 단 한번 호출되어야한다는 것을 의미
       expect(usersRepository.create).toHaveBeenCalledTimes(1);
       // 이 함수가 실행될 때 toHaveBeenCalledWith의 파라미터 값이 꼭 존재해야된다.
       expect(usersRepository.create).toHaveBeenCalledWith(createAccountArgs);
       expect(usersRepository.save).toHaveBeenCalledTimes(1);
       expect(usersRepository.save).toHaveBeenCalledWith(createAccountArgs);
+      expect(verificationRepository.create).toHaveBeenCalledTimes(1);
+      expect(verificationRepository.create).toHaveBeenCalledWith({
+        user: createAccountArgs,
+      });
+      expect(verificationRepository.save).toHaveBeenCalledTimes(1);
+      expect(verificationRepository.save).toHaveBeenCalledWith({
+        user: createAccountArgs,
+      });
+      expect(mailService.sendVerificationEmail).toBeCalledTimes(1);
+
+      // 함수가 파라미터의 어떤 타입을 사용했는지 확인해줌
+      expect(mailService.sendVerificationEmail).toBeCalledWith(
+        expect.any(String),
+        expect.any(String),
+      );
+      expect(result).toEqual({ ok: true });
+    });
+
+    it('should fail on exception', async () => {
+      usersRepository.findOne.mockRejectedValue(new Error());
+      const result = await service.createAccount(createAccountArgs);
+      expect(result).toEqual({ ok: false, error: 'Couldn`t create account' });
     });
   });
 
-  it.todo('login');
+  describe('login', () => {
+    const loginArgs = {
+      email: 'bs@email.com',
+      password: 'bs.password',
+    };
+    it('should fail of user does not exist', async () => {
+      usersRepository.findOne.mockResolvedValue(null);
+      const result = await service.login(loginArgs);
+
+      expect(usersRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(usersRepository.findOne).toHaveBeenCalledWith(expect.any(Object));
+
+      expect(result).toEqual({
+        ok: false,
+        error: 'User not found',
+      });
+    });
+  });
   it.todo('findById');
   it.todo('editProfile');
   it.todo('verifyEmail');
