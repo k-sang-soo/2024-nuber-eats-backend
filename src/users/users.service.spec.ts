@@ -15,7 +15,7 @@ const mockRepository = () => ({
 });
 
 const mockJwtService = {
-  sign: jest.fn(),
+  sign: jest.fn(() => 'signed-token-baby'),
   verify: jest.fn(),
 };
 
@@ -34,6 +34,7 @@ describe('UserService', () => {
   let service: UsersService;
   let usersRepository: MockRepository<User>;
   let verificationRepository: MockRepository<Verification>;
+  let jwtService: JwtService;
   let mailService: MailService;
 
   // beforeAll 모든 테스트가 실행되기 전에 딱 한 번 함수를 실행
@@ -71,6 +72,7 @@ describe('UserService', () => {
       ],
     }).compile();
     service = module.get<UsersService>(UsersService);
+    jwtService = module.get<JwtService>(JwtService);
     mailService = module.get<MailService>(MailService);
     usersRepository = module.get(getRepositoryToken(User));
     verificationRepository = module.get(getRepositoryToken(Verification));
@@ -159,6 +161,9 @@ describe('UserService', () => {
       password: 'bs.password',
     };
     it('should fail of user does not exist', async () => {
+      // service.login 안에 findOne의 값을 가로채서 usersRepository.findOne.mockResolvedValue 의 값으로 변경
+      // await service.login 에 굳이 null 을 안주고 mockResolvedValue 을 사용하는 이유는
+      // findOne 하나의 함수의 동작을 격리시켜 테스트하기 위해서
       usersRepository.findOne.mockResolvedValue(null);
       const result = await service.login(loginArgs);
 
@@ -169,6 +174,33 @@ describe('UserService', () => {
         ok: false,
         error: 'User not found',
       });
+    });
+
+    it('should fail if the password is wrong', async () => {
+      const mockedUser = {
+        checkPassword: jest.fn(() => Promise.resolve(false)),
+      };
+      usersRepository.findOne.mockResolvedValue(mockedUser);
+      const result = await service.login(loginArgs);
+      expect(result).toEqual({ ok: false, error: 'Wrong password' });
+    });
+
+    it('should return token if password correct', async () => {
+      const mockedUser = {
+        id: 1,
+        checkPassword: jest.fn(() => Promise.resolve(true)),
+      };
+      usersRepository.findOne.mockResolvedValue(mockedUser);
+      const result = await service.login(loginArgs);
+      expect(jwtService.sign).toHaveBeenCalledTimes(1);
+      expect(jwtService.sign).toBeCalledWith(expect.any(Number));
+      expect(result).toEqual({ ok: true, token: 'signed-token-baby' });
+    });
+
+    it('should fail on exception', async () => {
+      usersRepository.findOne.mockRejectedValue(new Error());
+      const result = await service.login(loginArgs);
+      expect(result).toEqual({ ok: false, error: 'Can`t log user in' });
     });
   });
   it.todo('findById');
