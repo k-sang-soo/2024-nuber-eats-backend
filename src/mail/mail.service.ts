@@ -3,7 +3,6 @@ import * as FormData from 'form-data';
 import { Inject, Injectable } from '@nestjs/common';
 import { CONFIG_OPTIONS } from 'src/common/common.constants';
 import { EmailVars, MailModuleOptions } from './mail.interfaces';
-import { string } from 'joi';
 
 @Injectable()
 export class MailService {

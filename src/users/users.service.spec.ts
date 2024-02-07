@@ -223,45 +223,52 @@ describe('UserService', () => {
     });
   });
 
-  // describe('editProfile', () => {
-  //   it('should change email', async () => {
-  //     const userId = 1;
-  //     const oldUser = {
-  //       id: userId,
-  //       email: 'bs@old.com',
-  //       verified: true,
-  //     };
-  //     const editProfileArgs = {
-  //       userId: userId,
-  //       input: { email: 'bs@new.com' },
-  //     };
-  //     const newVerification = {
-  //       code: 'code',
-  //     };
+  describe('editProfile', () => {
+    it('should change email', async () => {
+      const oldUser = {
+        id: 1,
+        email: 'bs@old.com',
+        verified: true,
+      };
+      const editProfileArgs = {
+        userId: 1,
+        input: { email: 'bs@new.com' },
+      };
+      const newVerification = {
+        code: 'code',
+      };
 
-  //     const newUser = {
-  //       id: 2,
-  //       email: editProfileArgs.input.email,
-  //       verified: false,
-  //     };
+      const newUser = {
+        id: 1,
+        email: editProfileArgs.input.email,
+        verified: false,
+      };
 
-  //     usersRepository.findOne.mockResolvedValue(oldUser);
-  //     verificationRepository.delete.mockResolvedValue(true);
-  //     verificationRepository.create.mockReturnValue(newVerification);
-  //     verificationRepository.save.mockResolvedValue(newVerification);
+      usersRepository.findOne.mockResolvedValue(oldUser);
+      verificationRepository.delete.mockResolvedValue({ affected: 1 });
+      verificationRepository.create.mockReturnValue(newVerification);
+      verificationRepository.save.mockResolvedValue(newVerification);
 
-  //     await service.editProfile(editProfileArgs.userId, editProfileArgs.input);
-  //     expect(usersRepository.findOne).toHaveBeenCalledTimes(1);
-  //     expect(usersRepository.findOne).toHaveBeenCalledWith({
-  //       where: { id: editProfileArgs.userId },
-  //     });
+      await service.editProfile(editProfileArgs.userId, editProfileArgs.input);
+      expect(usersRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(usersRepository.findOne).toHaveBeenCalledWith({
+        where: { id: editProfileArgs.userId },
+      });
 
-  //     expect(verificationRepository.delete).toHaveBeenCalledWith({
-  //       user: { id: editProfileArgs.userId },
-  //     });
+      expect(verificationRepository.delete).toHaveBeenCalledWith({
+        user: { id: editProfileArgs.userId },
+      });
 
-  //     expect(verificationRepository.create).toHaveBeenCalledWith(newUser);
-  //   });
-  // });
+      expect(verificationRepository.create).toHaveBeenCalledWith({
+        user: newUser,
+      });
+      expect(verificationRepository.save).toHaveBeenCalledWith(newVerification);
+
+      expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(
+        newUser.email,
+        newVerification.code,
+      );
+    });
+  });
   it.todo('verifyEmail');
 });
