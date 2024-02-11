@@ -30,7 +30,7 @@ registerEnumType(UserRole, { name: 'UserRole' });
 //isAbstract 는 GraphQL 스키마에 직접적으로 나타나지 않지만
 // "User" 클래스가 "CoreEntity" 필드들을 상속 받아 사용
 // 이렇게 하는 이유는 중복되는 설정을 관리하고 확장성 있는 구조를 만들기 위해 사용
-@InputType({ isAbstract: true })
+@InputType('UsersInputType', { isAbstract: true })
 // ObjectType 은 reutrn 값을 "User"로 받겠다는 의미
 @ObjectType()
 @Entity()

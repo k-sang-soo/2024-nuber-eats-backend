@@ -22,6 +22,7 @@ const verification_entity_1 = require("./users/entities/verification.entity");
 const mail_module_1 = require("./mail/mail.module");
 const restaurant_entity_1 = require("./restaurants/entities/restaurant.entity");
 const category_entity_1 = require("./restaurants/entities/category.entity");
+const restaurants_module_1 = require("./restaurants/restaurants.module");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(jwt_middleware_1.JwtMiddleWare).forRoutes({
@@ -79,6 +80,7 @@ exports.AppModule = AppModule = __decorate([
             jwt_module_1.JwtModule,
             auth_module_1.AuthModule,
             mail_module_1.MailModule,
+            restaurants_module_1.RestaurantsModule,
         ],
         controllers: [],
         providers: [],
