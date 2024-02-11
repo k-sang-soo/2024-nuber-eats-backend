@@ -4,8 +4,8 @@
 
 For building and running the application you need:
 
-- [Node.js 18.16.0](https://nodejs.org/ca/blog/release/v18.16.0/)
-- [Npm 9.5.1](https://www.npmjs.com/package/npm/v/9.5.1)
+- [Node.js 20.11.0](https://nodejs.org/ca/blog/release/v20.11.0/)
+- [Npm 10.2.4](https://www.npmjs.com/package/npm/v/10.2.4)
 
 ### Installation
 

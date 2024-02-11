@@ -16,16 +16,16 @@ const mockRepository = () => ({
   delete: jest.fn(),
 });
 
-const mockJwtService = {
+const mockJwtService = () => ({
   sign: jest.fn(() => 'signed-token-baby'),
   verify: jest.fn(),
-};
+});
 
-const mockMailService = {
+const mockMailService = () => ({
   sendVerificationEmail: jest.fn(),
-};
+});
 
-const mockConfigService = {};
+const mockConfigService = () => ({});
 
 // mockRepository 다른 점은 mockRepository은 UsersService 사용하는 함수
 // MockRepository 은 함수의 반환 값을 속이기 위함
@@ -61,15 +61,15 @@ describe('UserService', () => {
         },
         {
           provide: JwtService,
-          useValue: mockJwtService,
+          useValue: mockJwtService(),
         },
         {
           provide: MailService,
-          useValue: mockMailService,
+          useValue: mockMailService(),
         },
         {
           provide: ConfigService,
-          useValue: mockConfigService,
+          useValue: mockConfigService(),
         },
       ],
     }).compile();
@@ -269,6 +269,17 @@ describe('UserService', () => {
         newVerification.code,
       );
     });
+
+    // it('should change password', async () => {
+    //   const editProfileArgs = {
+    //     userId: 1,
+    //     input: { email: 'bs@new.com' },
+    //   };
+    //   usersRepository.findOne.mockResolvedValue({ password: 'old' });
+    //   await service.editProfile(editProfileArgs.userId, editProfileArgs.input);
+    //   expect(usersRepository.save).toHaveBeenCalledTimes(1);
+    //   expect(usersRepository.save).toHaveBeenCalledWith(editProfileArgs.input);
+    // });
   });
   it.todo('verifyEmail');
 });
