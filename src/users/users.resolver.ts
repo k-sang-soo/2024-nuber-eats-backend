@@ -15,6 +15,7 @@ import {
   VerifyEmailInput,
   VerifyEmailOutput,
 } from './entities/verify-email.dto';
+import { Role } from 'src/auth/role.decorator';
 
 @Resolver((of) => User)
 export class UsersResolver {
@@ -35,21 +36,21 @@ export class UsersResolver {
   @Query((returns) => User)
   // AuthGuard는 reuqest를 처리하리 전에 실행되고 reuqest 요청을 넘겨줄지만 판단
   // AuthGuard를 통과하고 AuthUser를 통해서 매개변수로 context의 값을 받아옴
-  @UseGuards(AuthGuard)
+  @Role(['Any'])
   me(@AuthUser() authUser: User) {
     return authUser;
   }
 
   @Query((returns) => UserProfileOutPut)
-  @UseGuards(AuthGuard)
+  @Role(['Any'])
   async userProfile(
     @Args() userProFileInput: UserProfileInput,
   ): Promise<UserProfileOutPut> {
     return this.usersService.findById(userProFileInput.userId);
   }
 
-  @UseGuards(AuthGuard)
   @Mutation((returns) => EditProfileOutput)
+  @Role(['Any'])
   async editProfile(
     @AuthUser() authUser: User,
     @Args('input') editProfileInput: EditProfileInput,
