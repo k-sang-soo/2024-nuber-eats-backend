@@ -1,7 +1,13 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { IsString, Length } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  RelationId,
+} from 'typeorm';
 import { Category } from './category.entity';
 import { User } from 'src/users/entities/users.entity';
 
@@ -44,4 +50,9 @@ export class Restaurant extends CoreEntity {
     onDelete: 'CASCADE',
   })
   owner: User;
+
+  // 특정 relation 의 id를 로드
+  // owner entity의 ManytoOne이 있는 경우 해당 속성 타입기반의 id를 가지고 온다는 걸 지정
+  @RelationId((restaurant: Restaurant) => restaurant.owner)
+  ownerId: number;
 }
